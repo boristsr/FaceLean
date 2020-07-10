@@ -7,25 +7,8 @@ from key_events import key_down, key_up
 
 ACTIVATION_THRESHOLD = 0.25
 
-# unit_vector and angle_between are from David Wolever on stack overflow
-# https://stackoverflow.com/a/13849249
-def unit_vector(vector):
-    """ Returns the unit vector of the vector.  """
+def get_normalized_vector(vector):
     return vector / np.linalg.norm(vector)
-
-def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'::
-
-            >>> angle_between((1, 0, 0), (0, 1, 0))
-            1.5707963267948966
-            >>> angle_between((1, 0, 0), (1, 0, 0))
-            0.0
-            >>> angle_between((1, 0, 0), (-1, 0, 0))
-            3.141592653589793
-    """
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 # shape_to_normal and get_eyes_noes_dlib are from 
 # https://towardsdatascience.com/precise-face-alignment-with-opencv-dlib-e6c8acead262
@@ -90,7 +73,7 @@ def main():
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         face_detected = False
-        detected_angle = 0
+        current_dot_product = 0
 
         rects = detector(gray, 0)
         if len(rects) > 0:
@@ -129,12 +112,12 @@ def main():
                 level_line_2 = np.add(eye_line_center, (int(eye_distance), 0))
                 frame = cv2.line(frame, tuple(level_line_1), tuple(level_line_2), blue)
 
-                level_line_vec = np.subtract(level_line_2, level_line_1) 
-                current_angle = angle_between(level_line_vec, eye_line_vec)
+                eye_line_vec_norm = get_normalized_vector(eye_line_vec)
+                current_dot_product = np.dot(eye_line_vec_norm, (0, 1))
 
-        if abs(current_angle) > ACTIVATION_THRESHOLD:
+        if face_detected and abs(current_dot_product) > ACTIVATION_THRESHOLD:
             #we are ready to activate!
-            if current_angle > 0.0:
+            if current_dot_product > 0.0:
                 lean_left_down()
                 lean_right_up()
             else:
@@ -145,7 +128,7 @@ def main():
             lean_right_up()
 
         face_detected_string = f'face detected: {str(face_detected)}'
-        angle_string = f'current angle: {str(current_angle)}'
+        angle_string = f'current angle: {str(current_dot_product)}'
         cv2.putText(frame, face_detected_string,(10,30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0), 2, cv2.LINE_AA)
         cv2.putText(frame, angle_string,(10,60),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0), 2, cv2.LINE_AA)
         # Display the resulting frame
