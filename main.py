@@ -5,7 +5,11 @@ import math
 
 from key_events import key_down, key_up
 
-ACTIVATION_THRESHOLD = 0.25
+ACTIVATION_THRESHOLD = 0.3
+ESC_KEY_CODE = 27
+# Colors in BGR format
+BLUE = (255, 0, 0)
+YELLOW = (0, 255, 255)
 
 def get_normalized_vector(vector):
     return vector / np.linalg.norm(vector)
@@ -86,31 +90,29 @@ def main():
                 shape = predictor(gray, rect)
 
                 shape = shape_to_normal(shape)
-                nose, left_eye, right_eye = get_eyes_nose_dlib(shape)
-                # Blue color in BGR 
-                blue = (255, 0, 0)
-                yellow = (0, 255, 255)
+                nose, left_eye_tuple, right_eye_tuple = get_eyes_nose_dlib(shape)
+                left_eye = np.array(left_eye_tuple)
+                right_eye = np.array(right_eye_tuple)
 
                 #Draw the detected eyes and eyeline
-                frame = cv2.circle(frame, left_eye, 5, yellow)
-                frame = cv2.circle(frame, right_eye, 5, yellow)
-                frame = cv2.line(frame, left_eye, right_eye, yellow)
+                frame = cv2.circle(frame, left_eye_tuple, 5, YELLOW)
+                frame = cv2.circle(frame, right_eye_tuple, 5, YELLOW)
+                frame = cv2.line(frame, left_eye_tuple, right_eye_tuple, YELLOW)
 
                 #calculate the difference vector between the eyes
-                eye_line_vec = np.subtract(right_eye, left_eye) 
-                eye_line_vec = np.array(eye_line_vec)
-                eye_line_vec = np.divide(eye_line_vec, (2,2))
+                eye_line_vec = right_eye - left_eye
+                eye_line_vec = eye_line_vec / 2
 
                 #Draw the center of the eyes
-                eye_line_center = np.add(left_eye, eye_line_vec)
-                eye_line_center = (int(eye_line_center[0]), int(eye_line_center[1]))
-                frame = cv2.circle(frame, eye_line_center, 5, blue)
+                eye_line_center = left_eye + eye_line_vec
+                eye_line_center_tuple = (int(eye_line_center[0]), int(eye_line_center[1]))
+                frame = cv2.circle(frame, eye_line_center_tuple, 5, BLUE)
 
                 #draw the level line
                 eye_distance = np.linalg.norm(eye_line_vec)
-                level_line_1 = np.add(eye_line_center, (int(-eye_distance), 0))
-                level_line_2 = np.add(eye_line_center, (int(eye_distance), 0))
-                frame = cv2.line(frame, tuple(level_line_1), tuple(level_line_2), blue)
+                level_line_1 = np.add(eye_line_center_tuple, (int(-eye_distance), 0))
+                level_line_2 = np.add(eye_line_center_tuple, (int(eye_distance), 0))
+                frame = cv2.line(frame, tuple(level_line_1), tuple(level_line_2), BLUE)
 
                 eye_line_vec_norm = get_normalized_vector(eye_line_vec)
                 current_dot_product = np.dot(eye_line_vec_norm, (0, 1))
@@ -131,9 +133,9 @@ def main():
         angle_string = f'current angle: {str(current_dot_product)}'
         cv2.putText(frame, face_detected_string,(10,30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0), 2, cv2.LINE_AA)
         cv2.putText(frame, angle_string,(10,60),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0), 2, cv2.LINE_AA)
-        # Display the resulting frame
+        # Display the frame with drawn markers
         cv2.imshow('frame',frame)
-        if cv2.waitKey(1) & 0xFF == ord('x'):
+        if cv2.waitKey(1) == ESC_KEY_CODE:
             break
 
     # When everything done, release the capture
