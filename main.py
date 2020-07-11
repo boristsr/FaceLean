@@ -117,17 +117,18 @@ def main():
                 eye_line_vec_norm = get_normalized_vector(eye_line_vec)
                 current_dot_product = np.dot(eye_line_vec_norm, (0, 1))
 
-        if face_detected and abs(current_dot_product) > ACTIVATION_THRESHOLD:
-            #we are ready to activate!
-            if current_dot_product > 0.0:
-                lean_left_down()
-                lean_right_up()
+        if face_detected:
+            if abs(current_dot_product) > ACTIVATION_THRESHOLD:
+                #we are ready to activate!
+                if current_dot_product > 0.0:
+                    lean_left_down()
+                    lean_right_up()
+                else:
+                    lean_right_down()
+                    lean_left_up()
             else:
-                lean_right_down()
                 lean_left_up()
-        else:
-            lean_left_up()
-            lean_right_up()
+                lean_right_up()
 
         face_detected_string = f'face detected: {str(face_detected)}'
         angle_string = f'current angle: {str(current_dot_product)}'
