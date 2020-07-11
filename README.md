@@ -10,6 +10,8 @@ An experiment to use a webcam as a game input device. More detail on this projec
 
 ### Requirements & installation
 
+DO NOT USE THIS ONLINE! I don't know if this will trigger anti-cheat systems. Don't risk it.
+
 Ensure you have the following software installed
 
 * CMake (latest)
