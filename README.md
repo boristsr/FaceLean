@@ -1,6 +1,8 @@
 # FaceLean
 An experiment to use a webcam as a game input device. More detail on this project is available on my blog: [https://www.gdcorner.com/2020/07/11/WebcamAsGameInput.html](https://www.gdcorner.com/2020/07/11/WebcamAsGameInput.html)
 
+Video of FaceLean in action: [https://www.youtube.com/watch?v=_NggXhsWcak](https://www.youtube.com/watch?v=_NggXhsWcak)
+
 ## Main tech used
 
 * [Python](https://www.python.org/)
