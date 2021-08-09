@@ -10,7 +10,7 @@ numpy==1.19.0
 opencv-python==4.3.0.36
 Pillow==7.2.0
 pylint==2.5.3
-pywin32==228
+pywin32==301
 six==1.15.0
 toml==0.10.1
 typed-ast==1.4.1
