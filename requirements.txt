@@ -6,7 +6,7 @@ lazy-object-proxy==1.4.3
 mccabe==0.6.1
 mypy==0.782
 mypy-extensions==0.4.3
-numpy==1.19.0
+numpy==1.22.0
 opencv-python==4.3.0.36
 Pillow==7.2.0
 pylint==2.5.3
